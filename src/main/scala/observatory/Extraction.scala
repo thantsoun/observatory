@@ -50,8 +50,8 @@ object Extraction {
 
   def doLolocateTemperatures(year: Year, stationsRaw: RDD[String], temperaturesRaw: RDD[String]): RDD[(LocalDate, Location, Temperature)] = {
 
-    val stations: RDD[(StationIdentifier, Location)] = stationsRaw.map(_.split(',')).map(record => ((record(0), record(1)), Location(record(2).toDouble, record(3).toDouble)))
-    val temperatures: RDD[(StationIdentifier, (LocalDate, Temperature))] = temperaturesRaw.map(_.split(',')).map(record => ((record(0), record(1)), (LocalDate.of(year, record(2).toInt, record(3).toInt), fahrenheitToCelsius(record(4).toDouble))))
+    val stations: RDD[(StationIdentifier, Location)] = stationsRaw.map(_.split(',')).filter(_.length == 4).map(record => ((record(0), record(1)), Location(record(2).toDouble, record(3).toDouble)))
+    val temperatures: RDD[(StationIdentifier, (LocalDate, Temperature))] = temperaturesRaw.map(_.split(',')).filter(_.length == 5).map(record => ((record(0), record(1)), (LocalDate.of(year, record(2).toInt, record(3).toInt), fahrenheitToCelsius(record(4).toDouble))))
 
     stations.join(temperatures).mapValues(value => (value._2._1, value._1, value._2._2)).values
   }

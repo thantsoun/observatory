@@ -1,7 +1,6 @@
 package observatory
 
 import com.sksamuel.scrimage.{Image, Pixel}
-import observatory.Visualization._
 
 import scala.math._
 
@@ -17,7 +16,7 @@ object Interaction {
   def tileLocation(tile: Tile): Location = {
     val zoomFactor = pow(2, tile.zoom)
     val lat = math.atan(math.sinh(math.Pi * (1.0 - 2.0 * tile.y) / zoomFactor))
-    Location(toDegrees(lat), tile.x * 360.0 / zoomFactor - 180.0)
+    Location(toDegrees(lat), tile.x * maxLongitude / zoomFactor - maxLatitude)
   }
 
   /**
@@ -27,23 +26,24 @@ object Interaction {
     * @return A 256×256 image showing the contents of the given tile
     */
   def tile(temperatures: Iterable[(Location, Temperature)], colors: Iterable[(Temperature, Color)], tile: Tile): Image = {
-    val width = 256
-    val height = 256
+    
+    val zoomFactor = 8
+    val tileSize = pow(2, zoomFactor).toInt
 
     val coords = for {
-      i <- 0 until height
-      j <- 0 until width
+      i <- 0 until tileSize
+      j <- 0 until tileSize
     } yield (i, j)
 
     val pixels = coords.par
-      .map({case (y, x) => Tile(x + (tile.x * width), y + (tile.y * height), tile.zoom + (math.log(width) / math.log(2)).toInt)})
+      .map({case (y, x) => Tile(x + (tile.x * tileSize), y + (tile.y * tileSize), tile.zoom + zoomFactor)})
       .map(tileLocation)
-      .map(predictTemperature(temperatures, _))
-      .map(interpolateColor(colors, _))
+      .map(Visualization.predictTemperature(temperatures, _))
+      .map(Visualization.interpolateColor(colors, _))
       .map(col => Pixel(col.red, col.green, col.blue, 255))
       .toArray
 
-    Image(width, height, pixels)
+    Image(tileSize, tileSize, pixels)
   }
 
   /**

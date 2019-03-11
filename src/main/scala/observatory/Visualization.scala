@@ -11,9 +11,6 @@ object Visualization {
 
   val width = 360
   val height = 180
-  val maxLong = 360
-  val maxLat = 180
-  val earthRadius = 6371
   val distanceLimit = 1
 
   val sumKeys: (Double, (Double, Temperature)) => Temperature = (acc: Double, pair: (Double, Temperature)) => acc + pair._1
@@ -47,8 +44,8 @@ object Visualization {
   }
 
   val pixelToLocation: PixelCoordinates => Location = pixel => {
-    val lon = (pixel._2 - width / 2) * (maxLong / width)
-    val lat = -(pixel._1 - height / 2) * (maxLat / height)
+    val lon = (pixel._2 - width / 2) * (maxLongitude / width)
+    val lat = -(pixel._1 - height / 2) * (maxLatitude / height)
     Location(lat, lon)
   }
 

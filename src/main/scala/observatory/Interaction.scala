@@ -26,16 +26,12 @@ object Interaction {
     * @return A 256×256 image showing the contents of the given tile
     */
   def tile(temperatures: Iterable[(Location, Temperature)], colors: Iterable[(Temperature, Color)], tile: Tile): Image = {
-    
-    val zoomFactor = 8
-    val tileSize = pow(2, zoomFactor).toInt
-
-    val coords = for {
+    val coordinates = for {
       i <- 0 until tileSize
       j <- 0 until tileSize
     } yield (i, j)
 
-    val pixels = coords.par
+    val pixels = coordinates.par
       .map({case (y, x) => Tile(x + (tile.x * tileSize), y + (tile.y * tileSize), tile.zoom + zoomFactor)})
       .map(tileLocation)
       .map(Visualization.predictTemperature(temperatures, _))

@@ -25,6 +25,11 @@ case class Tile(x: Int, y: Int, zoom: Int)
   */
 case class GridLocation(lat: Int, lon: Int)
 
+object GridLocation {
+  def apply(location: Location): GridLocation = new GridLocation(location.lat.toInt, location.lon.toInt)
+}
+
+
 /**
   * Introduced in Week 5. Represents a point inside of a grid cell.
   * @param x X coordinate inside the cell, 0 ≤ x ≤ 1
